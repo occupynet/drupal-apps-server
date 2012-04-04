@@ -1,0 +1,13 @@
+name = Number
+description = Defines numeric field types.
+package = Core
+version = VERSION
+core = 7.x
+dependencies[] = field
+files[] = number.test
+
+; Information added by drupal.org packaging script on 2012-04-03
+version = "7.12+156-dev"
+project = "drupal"
+datestamp = "1333412144"
+

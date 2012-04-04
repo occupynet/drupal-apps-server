@@ -1,0 +1,12 @@
+name = Help
+description = Manages the display of online help.
+package = Core
+version = VERSION
+core = 7.x
+files[] = help.test
+
+; Information added by drupal.org packaging script on 2012-04-03
+version = "7.12+156-dev"
+project = "drupal"
+datestamp = "1333412144"
+

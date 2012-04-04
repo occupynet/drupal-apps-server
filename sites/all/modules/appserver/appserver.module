@@ -1,0 +1,122 @@
+<?php
+/**
+ * @file appserver.module
+ */
+
+include_once('appserver.voting.inc');
+include_once('appserver.export.inc');
+include_once('appserver.features.inc');
+
+/**
+ * Implements hook_help().
+ */
+function appserver_help($path, $arg) {
+  switch ($path) {
+    case 'admin/help#appserver':
+      $output = file_get_contents(drupal_get_path('module', 'appserver') .'/README.txt');
+      return module_exists('markdown') ? filter_xss_admin(module_invoke('markdown', 'filter', 'process', 0, -1, $output)) : '<pre>'. check_plain($output) .'</pre>';
+  }
+}
+
+
+  /**
+ * Implements hook_menu().
+ */
+function appserver_menu() {
+  $items = array();
+  $items['app/export'] = array(
+    'title' => 'App Server Export',
+    'description' => 'Returns a filtered list of available apps',
+    'page callback' => 'appserver_create_manifest',
+    'page arguments' => array(1),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK
+  );
+  $items['app/query/%'] = array(
+    'title' => 'App Server Manifest',
+    'description' => 'Returns a filtered list of available apps',
+    'page callback' => 'appserver_query_type',
+    'page arguments' => array(2),
+    'access callback' => TRUE,
+    'type' => MENU_CALLBACK
+  );
+  //support voting
+  $items['apps/vote/%/%'] = array(
+    'page callback' => 'appserver_voting_vote',
+    'page arguments' => array(2, 3),
+    'access callback' => TRUE,
+  );
+  return $items;
+}
+
+/**
+ * Return a JSON document representing all of the Apps for a given Server Type.
+ *
+ * @param $term A term id, or a term name
+ */
+function appserver_query_type($term) {
+  $query = $_REQUEST;
+  drupal_alter("appserver_query", $query);
+  //check whether we have a taxonomy term or a tid - if we have a term load it
+  if(!is_numeric($term)){
+    $vid = taxonomy_vocabulary_machine_name_load('server_type')->vid;
+
+    //its a termname so we should load it
+    $query = new EntityFieldQuery;
+    $term = $query
+      ->entityCondition('entity_type', 'taxonomy_term')
+      ->propertyCondition('vid', $vid)
+      ->propertyCondition('name', $term)
+      ->execute();
+
+    $term = (current($term['taxonomy_term']));
+    $term = $term->tid;       
+  } 
+  $manifest = appserver_create_manifest($term);
+  drupal_json_output($manifest);
+}
+
+/**
+ * Implements hook_form_FORM_ID_alter().
+ *
+ * Add a validator to the Node submit form for App Releases.
+ */
+function appserver_form_app_release_node_form_alter(&$form, &$form_state, $form_id) {
+  $form['#validate'][] = 'appserver_app_release_node_form_validate';
+}
+
+/**
+ * Node form validator for the App Release node form.
+ *
+ * Validate that if data was entered in the Manifest field, that it is in .info format.
+ */
+function appserver_app_release_node_form_validate($form, &$form_state) {
+  $lang = $form_state['values']['language'];
+  $manifest = $form_state['values']['field_app_manifest'][$lang][0]['value'];
+  if (!empty($manifest)) {
+    $manifest_array = drupal_parse_info_format($manifest);
+    $keys = array('name', 'description', 'machine_name', 'version', 'author', 'author_url', 'downloadables');
+    $errors = array();
+    foreach ($keys as $key) {
+      if (!array_key_exists($key, $manifest_array)) {
+        $errors[] = t("Manifest missing '@name' property", array('@name' => $key));
+      }
+    }
+    if (array_key_exists('downloadable', $manifest_array)
+        && array_key_exists('downloadables', $manifest_array)
+        && !array_key_exists($manifest_array['downloadable'], $manifest_array['downloadables'])) {
+      $errors[] = t("Downloadable for app main module is missing");
+    }
+    if (!empty($errors)) {
+      form_set_error('field_app_manifest', implode('<br/>', $errors));
+    }
+  }
+
+}
+
+/**
+ * implements hook_init
+ */
+function appserver_init() {
+  drupal_add_css(drupal_get_path("module", "appserver"). '/appserver.css');
+}

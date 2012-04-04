@@ -1,0 +1,97 @@
+/* 
+*Extra Styles for l10 Apps
+*/
+
+body, #site-slogan, .ui-widget, .comment-form label {
+  font-family: "Lucida Grande", Arial, Helvetica, sans-serif;
+}
+
+.apps-list,
+.appserver-list {
+  margin-top: 20px;
+  margin-bottom: 30px;
+  border: 1px solid #CCC;
+  background: #EEE;
+  clear: both;
+  padding: 6px 5px 0px;
+}
+
+.apps-list ul,
+.appserver-list ul {
+  padding: 0px;
+  margin: 0px;
+  clear: both;
+}
+
+.apps-list ul {
+  display: inline-block;
+}
+.apps-list li,
+.appserver-list li {
+  display: block;
+  border: 1px solid #CCC;
+  background: white;
+  margin: 5px;
+  padding: 10px;
+  min-height : 110px;
+}
+.apps-list li {
+  float: left;
+  height: 110px;
+  width: 274px;
+}
+.appserver-list li {
+  padding-left: 125px;
+  position:relative;
+}
+
+.apps-list .app-logo,
+.appserver-list .app-logo {
+  float: left;
+  width: 100px;
+  height: 100px;
+  margin-right: 10px;
+}
+.appserver-list .app-logo {
+  float:none;
+  position : absolute;
+  left: 15px;
+}
+
+#content .apps-list h2.title,
+#content .appserver-list h2.title {
+  color: black;
+  margin: 0px;
+}
+#content .apps-list h2.title {
+  font-size: 16px;
+  letter-spacing: -1px;
+}
+
+.apps-featured-panel .view-content {
+  border: 1px solid #CCC;
+  background: white;
+  padding: 10px;
+}
+
+.apps-featured-panel {
+  background: #EEE;
+  padding: 10px;
+  border: 1px solid #CCC;
+  width: 910px;
+}
+
+.apps-featured-panel .app-screenshot {
+  margin-left: 350px;
+}
+
+.apps-featured-panel h2.title {
+  float: left;
+}
+.apps-featured-panel .description {
+  margin-top: 20px;
+  font-size: 12px;
+  width: 300px;
+  float: left;
+  clear: both;
+}
